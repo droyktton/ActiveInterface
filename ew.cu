@@ -1,6 +1,7 @@
 #include<thrust/device_vector.h>
 #include<thrust/for_each.h>
 #include <thrust/iterator/zip_iterator.h>
+#include <thrust/iterator/counting_iterator.h>
 #include <thrust/tuple.h>
 #include<thrust/reduce.h>
 #include<fstream>
@@ -12,6 +13,7 @@
 #include <chrono>
 #include <iomanip>
 #include <curand_kernel.h>
+#include <thrust/complex.h>
 
 
 // harmonic elasticity constant
@@ -74,6 +76,18 @@ typedef float real;
 typedef cufftComplex complex;
 #endif
 
+
+// kernel to initialize wave numbers in Fourier space (translate to thrust later...)
+__global__ void init_wave_numbers(complex* L_k, int N, real K, real L) {
+    int i = threadIdx.x + blockDim.x * blockIdx.x;
+    if (i < N) {
+        int k = (i <= N/2) ? i : i - N;
+        real kx = 2 * M_PI * k / L;
+        L_k[i] = make_float2(-K * kx * kx, 0.0f);
+    }
+}
+
+
 // file to log parameters of the run
 std::ofstream logout("logfile.dat");
 
@@ -89,7 +103,7 @@ class cuerda{
         
         // interface forces
         force_u.resize(L);
- 
+  
         // interface forces
         noise.resize(L);
         thrust::fill(noise.begin(),noise.end(),real(0.0));
@@ -117,6 +131,25 @@ class cuerda{
         #ifdef DEBUG
         std::cout << "L=" << L << ", dt=" << dt << std::endl;
         #endif
+        
+        #ifdef SPECTRALCN
+        z.resize(Lcomp); // Fourier components of the interface position 
+        z_hat.resize(Lcomp); // Fourier components of the interface position (complex)
+        nonlinear.resize(Lcomp); // nonlinear term in Fourier space
+        L_k.resize(Lcomp); // wave numbers in Fourier space
+        
+        init_wave_numbers<<<(Lcomp+255)/256,256>>>(thrust::raw_pointer_cast(&L_k[0]), Lcomp, C2, L);
+
+        // // initialize wave numbers in Fourier space
+        // thrust::for_each(thrust::make_counting_iterator(0),
+        //                   thrust::make_counting_iterator(Lcomp),
+        //                   [=] __device__ (unsigned long i) {
+        //                        int k = (i <= Lcomp-1) ? i : i - Lcomp;
+        //                        real kx = 2 * M_PI * k / Lcomp;
+        //                        L_k[i] = make_float2(-C2 * kx * kx, 0.0f);
+        //                   });
+        #endif
+
     }
 
     void flat_initial_condition(){
@@ -391,6 +424,14 @@ class cuerda{
         thrust::device_vector<real> acum_Sofq_u;
 	    thrust::device_vector<real> inst_Sofq_u;
 	    
+        #ifdef SPECTRALCN
+        cufftHandle plan_c2r;
+        thrust::device_vector<complex> z;
+        thrust::device_vector<complex> z_hat;
+        thrust::device_vector<complex> nonlinear;
+        thrust::device_vector<complex> L_k;
+        thrust::device_vector<complex> zaux;	    
+        #endif
 };
 
 int main(int argc, char **argv){
