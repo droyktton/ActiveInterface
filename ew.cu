@@ -115,8 +115,10 @@ class cuerda{
         // plans for the interface structure factor
         #ifdef DOUBLE
         CUFFT_SAFE_CALL(cufftPlan1d(&plan_r2c,L,CUFFT_D2Z,1));
+        CUFFT_SAFE_CALL(cufftPlan1d(&plan_c2r,L,CUFFT_Z2D,1));
         #else
         CUFFT_SAFE_CALL(cufftPlan1d(&plan_r2c,L,CUFFT_R2C,1));
+        CUFFT_SAFE_CALL(cufftPlan1d(&plan_c2r,L,CUFFT_C2R,1));
         #endif
 
 	    int Lcomp=L/2+1;
@@ -379,6 +381,24 @@ class cuerda{
         );
     };
 
+    // update using the spectral method
+    #ifdef SPECTRALCN
+    void update_spectral(unsigned long n){
+    
+        real *raw_u = thrust::raw_pointer_cast(&u[0]); 
+        complex *raw_fou_u = thrust::raw_pointer_cast(&Fou_u[0]); 
+
+        // raw_u --> transform --> raw_fou_u
+        #ifdef DOUBLE
+        CUFFT_SAFE_CALL(cufftExecD2Z(plan_r2c, raw_u, raw_fou_u));
+        #else
+	    CUFFT_SAFE_CALL(cufftExecR2C(plan_r2c, raw_u, raw_fou_u));
+        #endif
+    
+    }
+    #endif
+
+
     // print the whole configuration to a file
     void print_config(std::ofstream &out){
         real cm = center_of_mass();
@@ -417,15 +437,17 @@ class cuerda{
 
         thrust::device_vector<real> noise;
 
+
+        // variables for the structure factor
         int fourierCount;
         cufftHandle plan_r2c;
+        cufftHandle plan_c2r;
         thrust::device_vector<complex> Fou_u;
-
         thrust::device_vector<real> acum_Sofq_u;
 	    thrust::device_vector<real> inst_Sofq_u;
 	    
+	    // variables for the spectral method
         #ifdef SPECTRALCN
-        cufftHandle plan_c2r;
         thrust::device_vector<complex> z;
         thrust::device_vector<complex> z_hat;
         thrust::device_vector<complex> nonlinear;

@@ -4,7 +4,7 @@ TAU?=1.0
 MONITOR?=1000
 
 INCLUDES = -I/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/include 
-FLAGS = --expt-extended-lambda -lcufft -std=c++17 -arch=sm_75 -DSPECTRALCN
+FLAGS = --expt-extended-lambda -lcufft -std=c++17 -arch=sm_75 #-DSPECTRALCN
 PARAMSEW = -DC2=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) #-DDOUBLE  
 PARAMSKPZ = -DC2=1.0 -DKPZ=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR)  #-DDOUBLE  
 PARAMSANH = -DC2=1.0 -C4=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) #-DDOUBLE  
