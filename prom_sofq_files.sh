@@ -8,4 +8,4 @@ paste inst_sofq_*_.dat | awk '{acum=0; for(i=0;i<NF;i++){acum+=$i}; if(NF>0) pri
 file="sofq_"$samples"samples.dat"
 echo $file
 
-gnuplot -p -e "set logs; plot for[i=0:7] '$file' index i u 0:1 w lp t ''"
+gnuplot -p -e "set term png; set out 'sofq.png';set logs; plot for[i=0:7] '$file' index i u 0:1 w lp t ''"

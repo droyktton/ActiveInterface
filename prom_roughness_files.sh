@@ -19,4 +19,4 @@ if(NR>1) printf("\n") \
 
 file="roughness_"$samples"samples.dat"
 
-gnuplot -p -e "plot for[i=1:10] sprintf('cm_%d_.dat',i) u 4, '$file' u 4 w l"
+gnuplot -p -e "set term png; set output 'roughness.png'; set logs; plot for[i=1:10] sprintf('cm_%d_.dat',i) u 4, '$file' u 4 w l"

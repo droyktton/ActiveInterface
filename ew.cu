@@ -17,9 +17,9 @@
 
 
 // harmonic elasticity constant
-#ifndef C2
-#define C2 1.0   
-#endif
+//#ifndef C2
+//#define C2 1.0   
+//#endif
 
 // anharmonic elasticity constant
 /*
@@ -34,6 +34,11 @@
 #define KPZ 1.0   
 #endif
 */
+
+#ifndef Dt
+#define Dt 0.1   
+#endif
+
 
 // noise temperature
 #ifndef TEMP
@@ -83,7 +88,11 @@ __global__ void init_wave_numbers(complex* L_k, int N, real K, real L) {
     if (i < N) {
         int k = (i <= N/2) ? i : i - N;
         real kx = 2 * M_PI * k / L;
+        #ifdef DOUBLE
+        L_k[i] = make_double2(-K * kx * kx, 0.0);
+        #else
         L_k[i] = make_float2(-K * kx * kx, 0.0f);
+        #endif
     }
 }
 
@@ -140,7 +149,7 @@ class cuerda{
         nonlinear.resize(Lcomp); // nonlinear term in Fourier space
         L_k.resize(Lcomp); // wave numbers in Fourier space
         
-        init_wave_numbers<<<(Lcomp+255)/256,256>>>(thrust::raw_pointer_cast(&L_k[0]), Lcomp, C2, L);
+        //init_wave_numbers<<<(Lcomp+255)/256,256>>>(thrust::raw_pointer_cast(&L_k[0]), Lcomp, C2, L);
 
         // // initialize wave numbers in Fourier space
         // thrust::for_each(thrust::make_counting_iterator(0),
@@ -180,8 +189,8 @@ class cuerda{
                     unsigned long i=thrust::get<1>(t);
                     curandStatePhilox4_32_10_t state;
                     curand_init(seed_, i, n, &state);
-                    float ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
-                    thrust::get<0>(t) += -thrust::get<0>(t)*dt_/TAU + ran/sqrt(TAU);
+                    real ran = sqrtf(2*TEMP*dt_/TAU)*curand_normal(&state);
+                    thrust::get<0>(t) += -thrust::get<0>(t)*dt_/TAU + ran/TAU;
                 } 
             );  
         }
@@ -344,21 +353,29 @@ class cuerda{
                 // correlated noise update 
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, n, &state);
-                float ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
-                raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/sqrt(TAU);
+                real ran = sqrt(2*TEMP*dt_/TAU)*curand_normal(&state);
+                raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/TAU;
                                         
-                real lap_u = C2*(uright + uleft - 2.0*raw_u[i]);
+                //real lap_u = (uright + uleft - 2.0*raw_u[i]);
 
                 // modify element force
-                thrust::get<0>(t) = C2*lap_u + raw_noise[i];
-
-		#ifdef C4
-		thrust::get<0>(t) += C4*( powf(uright - raw_u[i],3.0) - powf(raw_u[i]-uleft,3.0) );	
-		#endif
-
-		#ifdef KPZ
-                thrust::get<0>(t) += KPZ*powf(0.5*(uright-uleft),2.0f);
-		#endif
+                thrust::get<0>(t) = raw_noise[i];
+                
+                #ifdef C2
+        		thrust::get<0>(t) += C2*( powf(uright - raw_u[i],1.0) - powf(raw_u[i]-uleft,1.0) );	                
+                #endif
+        		
+        		#ifdef C4
+        		thrust::get<0>(t) += C4*( powf(uright - raw_u[i],3.0) - powf(raw_u[i]-uleft,3.0) );	
+        		#endif
+        
+        		#ifdef C12
+        		thrust::get<0>(t) += C12*( powf(uright - raw_u[i],11.0) - powf(raw_u[i]-uleft,11.0) );	
+        		#endif
+        
+        		#ifdef KPZ
+                        thrust::get<0>(t) += KPZ*powf(0.5*(uright-uleft),2.0f);
+        		#endif
             } 
         );
 
@@ -493,7 +510,7 @@ int main(int argc, char **argv){
     unsigned long seed = atoi(argv[3]); // global seed
     
     // time step
-    real dt=0.1;
+    real dt=Dt;
 
     // equilibration
     unsigned long Neq = int(Nrun*0.75); // number of equilibration steps
@@ -527,10 +544,15 @@ int main(int argc, char **argv){
     #ifdef C4
     logout << "C4= " << C4 << "\n";
     #endif
+    #ifdef C12
+    logout << "C12= " << C12 << "\n";
+    #endif
     #ifdef KPZ
     logout << "KPZ= " << KPZ << "\n";
     #endif
-    
+    #ifdef TAU
+    logout << "TAU= " << TAU << "\n";
+    #endif
     logout 
 	<< "dt= " << dt << "\n"
 	<< "L= " << L << std::endl;

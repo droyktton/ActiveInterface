@@ -1,7 +1,8 @@
 CXX = nvcc
 
-TAU?=100.0
+TAU?=1.0
 MONITOR?=1000
+Dt?=0.1
 
 INCLUDES = -I/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/include 
 FLAGS = --expt-extended-lambda -lcufft -std=c++17 -arch=sm_75 \
@@ -9,22 +10,16 @@ FLAGS = --expt-extended-lambda -lcufft -std=c++17 -arch=sm_75 \
 PARAMSEW = -DC2=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) #-DDOUBLE  
 PARAMSKPZ = -DC2=1.0 -DKPZ=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR)  #-DDOUBLE  
 PARAMSANH = -DC2=1.0 -DC4=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) #-DDOUBLE  
-PARAMSPUREANH = -DC2=0.0 -DC4=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) #-DDOUBLE  
+PARAMSPUREANH = -DC12=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) -DDt=$(Dt) -DDOUBLE  
 
 LDFLAGS = -L/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/lib64 
 
 
-activeinterface: ew.cu
+activeinterface: ew.cu Makefile
 	$(CXX) $(FLAGS) $(PARAMSPUREANH) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
-
-anhinterface: ew.cu
-	$(CXX) $(FLAGS) $(PARAMSANH) ew.cu -o anhinterface $(LDFLAGS) $(INCLUDES) 
-
-kpzinterface: ew.cu
-	$(CXX) $(FLAGS) $(PARAMSKPZ) ew.cu -o kpzinterface $(LDFLAGS) $(INCLUDES) 
 
 update_git:
 	git add *.cu Makefile *.h *.sh README.md ; git commit -m "program update"; git push
 
 clean:
-	rm activeinterface kpzinterface anhinterface
+	rm activeinterface
