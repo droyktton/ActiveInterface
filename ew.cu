@@ -259,8 +259,8 @@ class cuerda{
         // center of mass displacement
         real cmu = thrust::reduce(u.begin(),u.end(),real(0.f),thrust::plus<real>())/real(L);
 	    
-	    // extreme displacements
-	    real u0=u[0]; 
+	// extreme displacements
+	real u0=u[0]; 
         real maxu = thrust::reduce(u.begin(),u.end(),u0,thrust::maximum<real>());
         real minu = thrust::reduce(u.begin(),u.end(),u0,thrust::minimum<real>());
 
