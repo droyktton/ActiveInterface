@@ -361,14 +361,19 @@ class cuerda{
                 // modify element force
                 thrust::get<0>(t) = raw_noise[i];
                 
-                #ifdef C2
+                	#ifdef C2
         		thrust::get<0>(t) += C2*( powf(uright - raw_u[i],1.0) - powf(raw_u[i]-uleft,1.0) );	                
-                #endif
+                	#endif
         		
         		#ifdef C4
         		thrust::get<0>(t) += C4*( powf(uright - raw_u[i],3.0) - powf(raw_u[i]-uleft,3.0) );	
         		#endif
         
+			#ifdef C6
+                        thrust::get<0>(t) += C6*( powf(uright - raw_u[i],5.0) - powf(raw_u[i]-uleft,5.0) );
+                        #endif
+
+
         		#ifdef C12
         		thrust::get<0>(t) += C12*( powf(uright - raw_u[i],11.0) - powf(raw_u[i]-uleft,11.0) );	
         		#endif
@@ -494,6 +499,9 @@ int main(int argc, char **argv){
     std::ofstream cmout("cm.dat");
     cmout << "#t" << " " << "velu" << " " << "cmu" << " " << "cmu2" << " " << "maxu" << " " << "minu" << std::endl;
 
+    std::ofstream cmlogout("cmlog.dat");
+    cmlogout << "#t" << " " << "velu" << " " << "cmu" << " " << "cmu2" << " " << "maxu" << " " << "minu" << std::endl;
+
     std::ofstream lastconfout("lastconf.dat");
     lastconfout << "#u[i]" << " " << "cmu" << "\n";
 
@@ -577,6 +585,7 @@ int main(int argc, char **argv){
             C.print_config(confout);
             C.fourier_transform();
             C.print_inst_sofq(instsofqout);
+	    C.print_roughness(cmlogout,dt*i);
             jlog*=10;
         }
         

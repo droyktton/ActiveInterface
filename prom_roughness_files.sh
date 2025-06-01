@@ -18,5 +18,6 @@ if(NR>1) printf("\n") \
 }' > "roughness_"$samples"samples.dat"
 
 file="roughness_"$samples"samples.dat"
+echo $file
 
 gnuplot -p -e "set term png; set output 'roughness.png'; set logs; plot '$file' u 4, '$file' u 4 w l"
