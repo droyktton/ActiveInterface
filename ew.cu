@@ -189,7 +189,7 @@ class cuerda{
                     unsigned long i=thrust::get<1>(t);
                     curandStatePhilox4_32_10_t state;
                     curand_init(seed_, i, n, &state);
-                    real ran = sqrtf(2*TEMP*dt_/TAU)*curand_normal(&state);
+                    real ran = sqrtf(2*TEMP*dt_)*curand_normal(&state);
                     thrust::get<0>(t) += -thrust::get<0>(t)*dt_/TAU + ran/TAU;
                 } 
             );  
@@ -353,7 +353,7 @@ class cuerda{
                 // correlated noise update 
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, n, &state);
-                real ran = sqrt(2*TEMP*dt_/TAU)*curand_normal(&state);
+                real ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
                 raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/TAU;
                                         
                 //real lap_u = (uright + uleft - 2.0*raw_u[i]);
