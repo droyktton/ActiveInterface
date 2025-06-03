@@ -570,7 +570,7 @@ int main(int argc, char **argv){
     auto start = std::chrono::high_resolution_clock::now();
 
     unsigned long jlog=1;
-    unsigned long jlog2=1;
+    unsigned long jlogx=1;
 
     for(int i=0;i<=Nrun;i++){
         C.update(i);
@@ -589,9 +589,9 @@ int main(int argc, char **argv){
             jlog*=10;
         }
         
-        if(i%jlog2==0){
+        if(i%jlogx==0){
 	        C.print_roughness(cmlogout,dt*i);
-            jlog2*=2;
+            jlogx*=2;
         }
         
         //if(i%Neq==0) C.reset_acum_Sofq();

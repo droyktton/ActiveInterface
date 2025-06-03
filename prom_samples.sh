@@ -13,5 +13,6 @@ do
     ./activeinterface $L $Nrun $semilla 
     cp inst_sofq.dat "inst_sofq_"$i"_.dat" 
     cp cm.dat "cm_"$i"_.dat";
+    cp cmlog.dat "cmlog_"$i"_.dat";
 done
 
