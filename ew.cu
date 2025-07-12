@@ -81,6 +81,16 @@ typedef float real;
 typedef cufftComplex complex;
 #endif
 
+__global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < N) {
+        float x = data[idx];
+        int bin = int((x - xmin) / (xmax - xmin) * Nbins);
+        if (bin >= 0 && bin < Nbins) {
+            atomicAdd(&bins[bin], 1);
+        }
+    }
+}
 
 // kernel to initialize wave numbers in Fourier space (translate to thrust later...)
 __global__ void init_wave_numbers(complex* L_k, int N, real K, real L) {
