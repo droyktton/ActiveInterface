@@ -81,10 +81,10 @@ typedef float real;
 typedef cufftComplex complex;
 #endif
 
-__global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax) {
+__global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
-        float x = data[idx];
+        float x = data[idx]-mean;
         int bin = int((x - xmin) / (xmax - xmin) * Nbins);
         if (bin >= 0 && bin < Nbins) {
             atomicAdd(&bins[bin], 1);
@@ -127,7 +127,11 @@ class cuerda{
         noise.resize(L);
         thrust::fill(noise.begin(),noise.end(),real(0.0));
         warmup_noise(); // warmup noise
- 
+
+	// height distribution
+	thrust::device_vector<int> pdf_u(NBINS);
+	thrust::fill(pdf_u.begin(),pdf_u.end(), real(0.0));
+
         // flat initial condition
         thrust::fill(u.begin(),u.end(),real(0.0));
         
@@ -321,6 +325,25 @@ class cuerda{
         real minu = thrust::get<3>(cm);
 
         out << t << " " << vcm << " " << cmu << " " << " " << cmu2 << " " << maxu << " " << minu << std::endl;
+    }
+
+    void print_pdf_u(std::ofstream &out, real t)
+    {
+        thrust::tuple<real,real,real,real> cm = roughness();
+        //get cmu,cmu2,maxu,minu
+        real cmu = thrust::get<0>(cm);
+        real cmu2 = thrust::get<1>(cm);
+        real maxu = thrust::get<2>(cm);
+        real minu = thrust::get<3>(cm);
+
+	real *raw_u = thrust::raw_pointer_cast(&u[0]); 
+	int *raw_pdf_u = thrust::raw_pointer_cast(&pdf_u[0]); 
+
+	//histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
+	histogramKernel(raw_u, raw_pdf_u, N, NBINS, -L, L, cmu);
+
+	for(int i=0;i<NBINS;i++)
+        out << -L+i*2L/NBINS << " " << pdf_u[i] << std::endl;
     }
 
     // Computes the forces and advance one time step using Euler method
@@ -600,7 +623,7 @@ int main(int argc, char **argv){
         }
         
         if(i%jlogx==0){
-	        C.print_roughness(cmlogout,dt*i);
+	    C.print_roughness(cmlogout,dt*i);
             jlogx*=2;
         }
         
