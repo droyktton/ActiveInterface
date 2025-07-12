@@ -346,7 +346,7 @@ class cuerda{
 	histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, -L, L, cmu);
 
 	for(int i=0;i<NBINS;i++)
-        out << -L+i*2L/NBINS << " " << pdf_u[i] << " " << t << "\n";
+        out << -L+i*L*2.0/NBINS << " " << pdf_u[i] << " " << t << "\n\n";
 	out << std::endl;
     }
 
