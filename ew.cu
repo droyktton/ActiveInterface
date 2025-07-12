@@ -343,7 +343,8 @@ class cuerda{
 	histogramKernel(raw_u, raw_pdf_u, N, NBINS, -L, L, cmu);
 
 	for(int i=0;i<NBINS;i++)
-        out << -L+i*2L/NBINS << " " << pdf_u[i] << std::endl;
+        out << -L+i*2L/NBINS << " " << pdf_u[i] << " " << t << "\n";
+	out << std::endl;
     }
 
     // Computes the forces and advance one time step using Euler method
@@ -626,7 +627,10 @@ int main(int argc, char **argv){
         
         if(i%jlogx==0){
 	    C.print_roughness(cmlogout,dt*i);
-            jlogx*=2;
+	    #ifdef NBINS	
+	    C.print_pdf_u(pdfout,dt*i);
+            #endif 
+	    jlogx*=2;
         }
         
         //if(i%Neq==0) C.reset_acum_Sofq();
