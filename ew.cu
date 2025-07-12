@@ -338,9 +338,9 @@ class cuerda{
 
 	real *raw_u = thrust::raw_pointer_cast(&u[0]); 
 	int *raw_pdf_u = thrust::raw_pointer_cast(&pdf_u[0]); 
-
+	int Ndata = u.size();
 	//histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
-	histogramKernel(raw_u, raw_pdf_u, N, NBINS, -L, L, cmu);
+	histogramKernel(raw_u, raw_pdf_u, Ndata, NBINS, -L, L, cmu);
 
 	for(int i=0;i<NBINS;i++)
         out << -L+i*2L/NBINS << " " << pdf_u[i] << " " << t << "\n";
