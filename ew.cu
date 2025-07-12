@@ -541,6 +541,9 @@ int main(int argc, char **argv){
     std::ofstream lastconfout("lastconf.dat");
     lastconfout << "#u[i]" << " " << "cmu" << "\n";
 
+    std::ofstream pdfout("pdfu.dat");
+    pdfout << "#u" << " " << "count " << "t" << "\n";
+
     if(argc!=4){
         std::cout << "Usage: " << argv[0] << " L Nrun seed" << std::endl;
         std::cout << "L: interface length" << std::endl;
