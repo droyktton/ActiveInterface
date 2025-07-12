@@ -349,6 +349,8 @@ class cuerda{
 
 	thrust::host_vector<int> h_pdf_u(pdf_u);
 
+	printf("Ndata=%d NBINS=%d min=%f max=%f cmu=%f\n", Ndata, NBINS, min, max, cmu);
+
 	for(int i=0;i<NBINS;i++)
         out << i << " " << -L+i*L*2.0/NBINS << " " << h_pdf_u[i] << " " << t << "\n";
 	out << "\n" << std::endl;
