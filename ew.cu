@@ -340,7 +340,10 @@ class cuerda{
 	int *raw_pdf_u = thrust::raw_pointer_cast(&pdf_u[0]); 
 	int Ndata = u.size();
 	//histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
-	histogramKernel(raw_u, raw_pdf_u, Ndata, NBINS, -L, L, cmu);
+
+	int threadsPerBlock = 256;
+	int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
+	histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, -L, L, cmu);
 
 	for(int i=0;i<NBINS;i++)
         out << -L+i*2L/NBINS << " " << pdf_u[i] << " " << t << "\n";
