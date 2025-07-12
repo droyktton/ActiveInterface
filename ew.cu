@@ -129,7 +129,7 @@ class cuerda{
         warmup_noise(); // warmup noise
 
 	// height distribution
-	thrust::device_vector<int> pdf_u(NBINS);
+	pdf_u.resize(NBINS);
 	thrust::fill(pdf_u.begin(),pdf_u.end(), real(0.0));
 
         // flat initial condition
@@ -492,6 +492,8 @@ class cuerda{
 
         thrust::device_vector<real> noise;
 
+	// height distribution
+	thrust::device_vector<int> pdf_u;
 
         // variables for the structure factor
         int fourierCount;
