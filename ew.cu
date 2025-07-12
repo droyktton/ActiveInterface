@@ -86,7 +86,7 @@ __global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, 
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
         float x = data[idx]-mean;
-        int bin = int((x - xmin) / (xmax - xmin) * Nbins);
+        int bin = int(((x - xmin) / (xmax - xmin)) * Nbins);
         if (bin >= 0 && bin < Nbins) {
             atomicAdd(&bins[bin], 1);
         }
