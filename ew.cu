@@ -330,6 +330,7 @@ class cuerda{
 
     void print_pdf_u(std::ofstream &out, real t)
     {
+        thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
         thrust::tuple<real,real,real,real> cm = roughness();
         //get cmu,cmu2,maxu,minu
         real cmu = thrust::get<0>(cm);
@@ -337,24 +338,25 @@ class cuerda{
         real maxu = thrust::get<2>(cm);
         real minu = thrust::get<3>(cm);
 
-	real *raw_u = thrust::raw_pointer_cast(&u[0]); 
-	int *raw_pdf_u = thrust::raw_pointer_cast(&pdf_u[0]); 
-	int Ndata = u.size();
-	//histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
+        real *raw_u = thrust::raw_pointer_cast(&u[0]); 
+        int *raw_pdf_u = thrust::raw_pointer_cast(&pdf_u[0]); 
+        int Ndata = u.size();
+        //histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
 
-	int threadsPerBlock = 256;
-	int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
-	float max = float(L); float min = -float(L);
-	histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, min, max, cmu);
+        int threadsPerBlock = 256;
+        int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
+        float max = float(L); float min = -float(L);
+        histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, min, max, cmu);
 
-	thrust::host_vector<int> h_pdf_u(pdf_u);
+        thrust::host_vector<int> h_pdf_u(pdf_u);
 
-	printf("Ndata=%d NBINS=%d min=%f max=%f cmu=%f\n", Ndata, NBINS, min, max, cmu);
+        printf("Ndata=%d NBINS=%d min=%f max=%f cmu=%f\n", Ndata, NBINS, min, max, cmu);
 
-	for(int i=0;i<NBINS;i++)
-        out << i << " " << -float(L)+i*float(L)*2.0/NBINS << " " << h_pdf_u[i] << " " << t << "\n";
-	out << "\n" << std::endl;
+        for(int i=0;i<NBINS;i++)
+        out << i << " " << min+i*(max-min)/NBINS << " " << h_pdf_u[i] << " " << t << "\n";
+        out << "\n" << std::endl;
     }
+
 
     // Computes the forces and advance one time step using Euler method
     void update(unsigned long n)
