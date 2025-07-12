@@ -82,10 +82,10 @@ typedef float real;
 typedef cufftComplex complex;
 #endif
 
-__global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean) {
+__global__ void histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean, float var) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < N) {
-        float x = data[idx]-mean;
+        float x = (data[idx]-mean)/sqrt(var);
         int bin = int(((x - xmin) / (xmax - xmin)) * Nbins);
         if (bin >= 0 && bin < Nbins) {
             atomicAdd(&bins[bin], 1);
@@ -345,8 +345,8 @@ class cuerda{
 
         int threadsPerBlock = 256;
         int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
-        float max = 0.01*float(L); float min = -0.01*float(L);
-        histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, min, max, cmu);
+        float max = 2.0; float min = -2.0;
+        histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, min, max, cmu, cmu2);
 
         thrust::host_vector<int> h_pdf_u(pdf_u);
 
