@@ -345,7 +345,7 @@ class cuerda{
 
         int threadsPerBlock = 256;
         int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
-        float max = 2.0; float min = -2.0;
+        float max = 4.0; float min = -4.0;
         histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_u, raw_pdf_u, Ndata, NBINS, min, max, cmu, cmu2);
 
         thrust::host_vector<int> h_pdf_u(pdf_u);
