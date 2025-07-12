@@ -131,7 +131,7 @@ class cuerda{
 
 	// height distribution
 	pdf_u.resize(NBINS);
-	thrust::fill(pdf_u.begin(),pdf_u.end(), real(0.0));
+	thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
 
         // flat initial condition
         thrust::fill(u.begin(),u.end(),real(0.0));
@@ -352,7 +352,7 @@ class cuerda{
 	printf("Ndata=%d NBINS=%d min=%f max=%f cmu=%f\n", Ndata, NBINS, min, max, cmu);
 
 	for(int i=0;i<NBINS;i++)
-        out << i << " " << -L+i*L*2.0/NBINS << " " << h_pdf_u[i] << " " << t << "\n";
+        out << i << " " << -float(L)+i*float(L)*2.0/NBINS << " " << h_pdf_u[i] << " " << t << "\n";
 	out << "\n" << std::endl;
     }
 
