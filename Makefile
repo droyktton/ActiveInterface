@@ -16,7 +16,7 @@ LDFLAGS = -L/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/lib64
 
 
 activeinterface: ew.cu Makefile
-	$(CXX) $(FLAGS) $(PARAMSEW) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
+	$(CXX) $(FLAGS) $(PARAMS) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
 
 update_git:
 	git add *.cu Makefile *.h *.sh README.md ; git commit -m "program update"; git push
