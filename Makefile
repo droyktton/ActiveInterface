@@ -14,9 +14,20 @@ PARAMSPUREANH = -DC12=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) -DDt=$(Dt) -DNBINS=1
 
 LDFLAGS = -L/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/lib64 
 
+EW: 
+	$(CXX) $(FLAGS) $(PARAMSEW) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
+
+KPZ: 
+	$(CXX) $(FLAGS) $(PARAMSKPZ) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
+
+ANH: 
+	$(CXX) $(FLAGS) $(PARAMSANH) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
+
+STRONGANH: 
+	$(CXX) $(FLAGS) $(PARAMSPUREANH) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
 
 activeinterface: ew.cu Makefile
-	$(CXX) $(FLAGS) $(PARAMS) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
+	$(CXX) $(FLAGS) $(PARAMSEW) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
 
 update_git:
 	git add *.cu Makefile *.h *.sh README.md ; git commit -m "program update"; git push
