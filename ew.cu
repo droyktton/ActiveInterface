@@ -127,7 +127,10 @@ class cuerda{
         // interface forces
         noise.resize(L);
         thrust::fill(noise.begin(),noise.end(),real(0.0));
-        warmup_noise(); // warmup noise
+
+		#ifndef TAUINFINITO
+		warmup_noise(); // warmup noise
+		#endif
 
 	// height distribution
 	pdf_u.resize(NBINS);
