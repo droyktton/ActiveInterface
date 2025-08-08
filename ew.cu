@@ -394,13 +394,22 @@ class cuerda{
                     uright += L_*TILT;
                 }  
                 #endif
-                
+
+				#ifndef TAUINFINITO
                 // correlated noise update 
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, n, &state);
                 real ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
                 raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/TAU;
-                                        
+				#else
+                // correlated noise update 
+                curandStatePhilox4_32_10_t state;
+                curand_init(seed_, i, 1, &state);
+                real ran = curand_normal(&state);
+                raw_noise[i] = ran;
+				#endif
+
+
                 //real lap_u = (uright + uleft - 2.0*raw_u[i]);
 
                 // modify element force
