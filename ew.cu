@@ -321,12 +321,14 @@ class cuerda{
             thrust::plus<real>()
         )/real(L);
 
+		real sigma=sqrt(cmu2);
+
         // skewness
         real cmu3 = 
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)*(x-cmu)/powf(cmu2,3./2.);
+                return (x-cmu)*(x-cmu)*(x-cmu)/powf(sigma,3.);
             },
             real(0.f),
             thrust::plus<real>()
@@ -337,7 +339,7 @@ class cuerda{
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)*(x-cmu)*(x-cmu)/powf(cmu2,4./2.);
+                return (x-cmu)*(x-cmu)*(x-cmu)*(x-cmu)/powf(sigma,4.);
             },
             real(0.f),
             thrust::plus<real>()
