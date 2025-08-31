@@ -343,7 +343,7 @@ class cuerda{
             thrust::plus<real>()
         )/real(L);
 
-        return thrust::make_tuple(cmu,cmu2,cm3,cm4,maxu,minu);
+        return thrust::make_tuple(cmu,cmu2,cmu3,cmu4,maxu,minu);
     }
 
 
