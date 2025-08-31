@@ -389,7 +389,7 @@ class cuerda{
     void print_pdf_u(std::ofstream &out, real t)
     {
         thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
-        thrust::tuple<real,real,real,real> cm = ();
+        thrust::tuple<real,real,real,real> cm = roughness();
         //get cmu,cmu2,maxu,minu
         real cmu = thrust::get<0>(cm);
         real cmu2 = thrust::get<1>(cm);
