@@ -315,7 +315,7 @@ class cuerda{
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)/powf(cmu2,2./2.);
+                return (x-cmu)*(x-cmu);
             },
             real(0.f),
             thrust::plus<real>()
