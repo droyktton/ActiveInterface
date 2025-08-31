@@ -707,10 +707,10 @@ int main(int argc, char **argv){
         }
         
         if(i%jlogx==0){
-	    C.print_(cmlogout,dt*i);
+	    C.print_roughness(cmlogout,dt*i);
 	    #ifdef NBINS	
 	    C.print_pdf_u(pdfout,dt*i);
-            #endif 
+        #endif 
 	    jlogx*=2;
         }
         
