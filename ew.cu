@@ -717,7 +717,7 @@ int main(int argc, char **argv){
         //if(i%Neq==0) C.reset_acum_Sofq();
                         
         if(i%MONITOR==0){
-            C.print_(cmout,dt*i);
+            C.print_roughness(cmout,dt*i);
         }
     }
 
