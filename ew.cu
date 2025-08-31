@@ -436,7 +436,7 @@ class cuerda{
         		#endif
         
         		#ifdef KPZ
-                        thrust::get<0>(t) += KPZ*powf(0.5*(uright-uleft),2.0f);
+                        thrust::get<0>(t) += 0.5*KPZ*powf((uright-uleft),2.0f);
         		#endif
             } 
         );
