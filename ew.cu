@@ -371,15 +371,19 @@ class cuerda{
     {
         real vcm=center_of_mass_velocity();
 
-        thrust::tuple<real,real,real,real> cm = roughness();
+        thrust::tuple<real,real,real,real,real,real> cm = roughnessx4();
 
-        //get cmu,cmu2,maxu,minu
+        //get cmu,cmu2,cm3,cm4, maxu,minu
         real cmu = thrust::get<0>(cm);
         real cmu2 = thrust::get<1>(cm);
-        real maxu = thrust::get<2>(cm);
-        real minu = thrust::get<3>(cm);
+        real cmu3 = thrust::get<2>(cm);
+        real cmu4 = thrust::get<3>(cm);
+        real maxu = thrust::get<4>(cm);
+        real minu = thrust::get<5>(cm);
 
-        out << t << " " << vcm << " " << cmu << " " << " " << cmu2 << " " << maxu << " " << minu << std::endl;
+        out << t << " " << vcm << " " 
+			<< cmu << " " << " " << cmu2 << " " << cmu3 << " " << cmu4 
+			<< " " << maxu << " " << minu << std::endl;
     }
 
     void print_pdf_u(std::ofstream &out, real t)
