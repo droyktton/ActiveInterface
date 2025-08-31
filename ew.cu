@@ -315,7 +315,7 @@ class cuerda{
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)//powf(cm2,2./2.);
+                return (x-cmu)*(x-cmu)//powf(cmu2,2./2.);
             },
             real(0.f),
             thrust::plus<real>()
@@ -326,7 +326,7 @@ class cuerda{
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)*(x-cmu)/powf(cm2,3./2.);
+                return (x-cmu)*(x-cmu)*(x-cmu)/powf(cmu2,3./2.);
             },
             real(0.f),
             thrust::plus<real>()
@@ -337,7 +337,7 @@ class cuerda{
         thrust::transform_reduce(
             u.begin(),u.end(),
             [=] __device__ __host__ (real x){
-                return (x-cmu)*(x-cmu)*(x-cmu)*(x-cmu)//powf(cm2,4./2.);
+                return (x-cmu)*(x-cmu)*(x-cmu)*(x-cmu)/powf(cmu2,4./2.);
             },
             real(0.f),
             thrust::plus<real>()
