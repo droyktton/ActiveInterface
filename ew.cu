@@ -277,8 +277,8 @@ class cuerda{
         // center of mass displacement
         real cmu = thrust::reduce(u.begin(),u.end(),real(0.f),thrust::plus<real>())/real(L);
 	    
-	// extreme displacements
-	real u0=u[0]; 
+		// extreme displacements
+		real u0=u[0]; 
         real maxu = thrust::reduce(u.begin(),u.end(),u0,thrust::maximum<real>());
         real minu = thrust::reduce(u.begin(),u.end(),u0,thrust::minimum<real>());
 
@@ -295,6 +295,57 @@ class cuerda{
 
         return thrust::make_tuple(cmu,cmu2,maxu,minu);
     }
+
+    // computes the center of mass, the variance (roughness), skewness and kurtosis
+    // and the leading and receding points of the interface 
+    thrust::tuple<real, real, real, real, real, real> roughnessx4()
+    {
+        // CHECK for large numbers!
+        
+        // center of mass displacement
+        real cmu = thrust::reduce(u.begin(),u.end(),real(0.f),thrust::plus<real>())/real(L);
+	    
+		// extreme displacements
+		real u0=u[0]; 
+        real maxu = thrust::reduce(u.begin(),u.end(),u0,thrust::maximum<real>());
+        real minu = thrust::reduce(u.begin(),u.end(),u0,thrust::minimum<real>());
+
+        // variance or roughness
+        real cmu2 = 
+        thrust::transform_reduce(
+            u.begin(),u.end(),
+            [=] __device__ __host__ (real x){
+                return (x-cmu)*(x-cmu);
+            },
+            real(0.f),
+            thrust::plus<real>()
+        )/real(L);
+
+        // skewness
+        real cmu3 = 
+        thrust::transform_reduce(
+            u.begin(),u.end(),
+            [=] __device__ __host__ (real x){
+                return (x-cmu)*(x-cmu)*(x-cmu);
+            },
+            real(0.f),
+            thrust::plus<real>()
+        )/real(L);
+
+        // kurtosis
+        real cmu4 = 
+        thrust::transform_reduce(
+            u.begin(),u.end(),
+            [=] __device__ __host__ (real x){
+                return (x-cmu)*(x-cmu)*(x-cmu)*(x-cmu);
+            },
+            real(0.f),
+            thrust::plus<real>()
+        )/real(L);
+
+        return thrust::make_tuple(cmu,cmu2,cm3,cm4,maxu,minu);
+    }
+
 
     // just compute and prints center of mass in out stream
     void print_center_of_mass(std::ofstream &out)
@@ -334,7 +385,7 @@ class cuerda{
     void print_pdf_u(std::ofstream &out, real t)
     {
         thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
-        thrust::tuple<real,real,real,real> cm = roughness();
+        thrust::tuple<real,real,real,real> cm = ();
         //get cmu,cmu2,maxu,minu
         real cmu = thrust::get<0>(cm);
         real cmu2 = thrust::get<1>(cm);
@@ -652,7 +703,7 @@ int main(int argc, char **argv){
         }
         
         if(i%jlogx==0){
-	    C.print_roughness(cmlogout,dt*i);
+	    C.print_(cmlogout,dt*i);
 	    #ifdef NBINS	
 	    C.print_pdf_u(pdfout,dt*i);
             #endif 
@@ -662,7 +713,7 @@ int main(int argc, char **argv){
         //if(i%Neq==0) C.reset_acum_Sofq();
                         
         if(i%MONITOR==0){
-            C.print_roughness(cmout,dt*i);
+            C.print_(cmout,dt*i);
         }
     }
 
