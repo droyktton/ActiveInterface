@@ -552,9 +552,9 @@ class cuerda{
     };
 
     // prints the instantaneous structure factor to a file
-    void print_inst_sofq(std::ofstream &out){
+    void print_inst_sofq(std::ofstream &out, real t){
         for(int i=0;i<L;i++){
-            out << inst_Sofq_u[i] << "\n";
+            out << inst_Sofq_u[i] << " " << t << "\n";
         }
         out << "\n" << std::endl;
     };
@@ -702,14 +702,14 @@ int main(int argc, char **argv){
         if(i%MONITORCONF==0){
             C.print_config(confout);
             C.fourier_transform();
-            C.print_inst_sofq(instsofqoutmonitor);
+            C.print_inst_sofq(instsofqoutmonitor,dt*i);
         }
                 
         // print configs and structure factors at 1,10,100,etc...        
         if(i%jlog==0){
             C.print_config(confout);
             C.fourier_transform();
-            C.print_inst_sofq(instsofqout);
+            C.print_inst_sofq(instsofqout,dt*i);
             jlog*=10;
         }
         
