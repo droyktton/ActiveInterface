@@ -610,6 +610,10 @@ int main(int argc, char **argv){
     std::ofstream instsofqout("inst_sofq.dat");
     instsofqout << "#inst_Sofq_u[i]" << "\n";
 
+    std::ofstream instsofqoutmonitor("inst_sofq_monitor.dat");
+    instsofqoutmonitor << "#inst_Sofq_u[i]" << "\n";
+
+
     std::ofstream cmout("cm.dat");
     cmout << "#t" << " " << "velu" << " " << "cmu" << " " << "cmu2" << " " << "maxu" << " " << "minu" << std::endl;
 
@@ -698,7 +702,7 @@ int main(int argc, char **argv){
         if(i%MONITORCONF==0){
             C.print_config(confout);
             C.fourier_transform();
-            C.print_inst_sofq(instsofqout);
+            C.print_inst_sofq(instsofqoutmonitor);
         }
                 
         // print configs and structure factors at 1,10,100,etc...        
