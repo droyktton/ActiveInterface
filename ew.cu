@@ -469,31 +469,29 @@ class cuerda{
                 raw_noise[i] = ran;
 				#endif
 
-
                 //real lap_u = (uright + uleft - 2.0*raw_u[i]);
 
                 // modify element force
                 thrust::get<0>(t) = raw_noise[i];
                 
-                	#ifdef C2
+                #ifdef C2
         		thrust::get<0>(t) += C2*( powf(uright - raw_u[i],1.0) - powf(raw_u[i]-uleft,1.0) );	                
-                	#endif
+                #endif
         		
         		#ifdef C4
         		thrust::get<0>(t) += C4*( powf(uright - raw_u[i],3.0) - powf(raw_u[i]-uleft,3.0) );	
         		#endif
         
-			#ifdef C6
-                        thrust::get<0>(t) += C6*( powf(uright - raw_u[i],5.0) - powf(raw_u[i]-uleft,5.0) );
-                        #endif
-
+			    #ifdef C6
+                thrust::get<0>(t) += C6*( powf(uright - raw_u[i],5.0) - powf(raw_u[i]-uleft,5.0) );
+                #endif
 
         		#ifdef C12
         		thrust::get<0>(t) += C12*( powf(uright - raw_u[i],11.0) - powf(raw_u[i]-uleft,11.0) );	
         		#endif
         
         		#ifdef KPZ
-                        thrust::get<0>(t) += 0.5*KPZ*powf((uright-uleft),2.0f);
+                thrust::get<0>(t) += 0.5*KPZ*powf((uright-uleft),2.0f);
         		#endif
             } 
         );
@@ -680,6 +678,9 @@ int main(int argc, char **argv){
     #ifdef TAU
     logout << "TAU= " << TAU << "\n";
     #endif
+    #ifdef TAUINFINITO
+    logout << "TAUINFINITO" << "\n";
+    #endif
     logout 
 	<< "dt= " << dt << "\n"
 	<< "L= " << L << std::endl;
@@ -709,11 +710,11 @@ int main(int argc, char **argv){
         }
         
         if(i%jlogx==0){
-	    C.print_roughness(cmlogout,dt*i);
-	    #ifdef NBINS	
-	    C.print_pdf_u(pdfout,dt*i);
-        #endif 
-	    jlogx*=2;
+    	    C.print_roughness(cmlogout,dt*i);
+    	    #ifdef NBINS	
+    	    C.print_pdf_u(pdfout,dt*i);
+            #endif 
+    	    jlogx*=2;
         }
         
         //if(i%Neq==0) C.reset_acum_Sofq();
