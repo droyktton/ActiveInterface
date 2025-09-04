@@ -120,6 +120,7 @@ class cuerda{
     {
         // interface position
         u.resize(L);
+        dudx.resize(L);
         
         // interface forces
         force_u.resize(L);
@@ -132,9 +133,11 @@ class cuerda{
 		warmup_noise(); // warmup noise
 		#endif
 
-	// height distribution
-	pdf_u.resize(NBINS);
-	thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
+	    // height distribution
+	    pdf_u.resize(NBINS);
+	    pdf_dudx.resize(NBINS);
+	    thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
+	    thrust::fill(pdf_dudx.begin(),pdf_dudx.end(), 0);
 
         // flat initial condition
         thrust::fill(u.begin(),u.end(),real(0.0));
@@ -417,12 +420,37 @@ class cuerda{
         out << "\n" << std::endl;
     }
 
+    void print_pdf_dudx(std::ofstream &out, real t)
+    {
+        thrust::fill(pdf_dudx.begin(),pdf_dudx.end(), 0);
+        
+        
+        
+        real *raw_dudx = thrust::raw_pointer_cast(&dudx[0]); 
+        int *raw_pdf_dudx = thrust::raw_pointer_cast(&pdf_dudx[0]); 
+        int Ndata = dudx.size();
+        //histogramKernel(const float* data, int* bins, int N, int Nbins, float xmin, float xmax, float mean)
+
+        int threadsPerBlock = 256;
+        int blocksPerGrid = (Ndata + threadsPerBlock - 1) / threadsPerBlock;
+        float max = 4.0; float min = -4.0;
+        histogramKernel<<<blocksPerGrid, threadsPerBlock>>>(raw_dudx, raw_pdf_dudx, Ndata, NBINS, min, max, 0.0, 1.0);
+
+        thrust::host_vector<int> h_pdf_dudx(pdf_dudx);
+
+        //printf("Ndata=%d NBINS=%d min=%f max=%f cmu=%f\n", Ndata, NBINS, min, max, cmu);
+
+        for(int i=0;i<NBINS;i++)
+        out << i << " " << min+i*(max-min)/NBINS << " " << h_pdf_dudx[i] << " " << t << "\n";
+        out << "\n" << std::endl;
+    }
 
     // Computes the forces and advance one time step using Euler method
     void update(unsigned long n)
     {
         real *raw_u = thrust::raw_pointer_cast(&u[0]); 
         real *raw_noise = thrust::raw_pointer_cast(&noise[0]); 
+        real *raw_dudx = thrust::raw_pointer_cast(&dudx[0]); 
 
         // variables to be captured by lambda (not elegant...)
         real dt_=dt;
@@ -493,6 +521,8 @@ class cuerda{
         		#ifdef KPZ
                 thrust::get<0>(t) += 0.5*KPZ*powf((uright-uleft),2.0f);
         		#endif
+        		
+        		raw_dudx[i] = uright - raw_u[i];
             } 
         );
 
@@ -567,12 +597,17 @@ class cuerda{
         
         real f0;
         thrust::device_vector<real> u;
+        thrust::device_vector<real> dudx;
+
         thrust::device_vector<real> force_u;
 
         thrust::device_vector<real> noise;
 
-	// height distribution
-	thrust::device_vector<int> pdf_u;
+    	// height distribution
+	    thrust::device_vector<int> pdf_u;
+
+	    // slopes distribution
+	    thrust::device_vector<int> pdf_dudx;
 
         // variables for the structure factor
         int fourierCount;
@@ -613,7 +648,6 @@ int main(int argc, char **argv){
     std::ofstream instsofqoutmonitor("inst_sofq_monitor.dat");
     instsofqoutmonitor << "#inst_Sofq_u[i]" << "\n";
 
-
     std::ofstream cmout("cm.dat");
     cmout << "#t" << " " << "velu" << " " << "cmu" << " " << "cmu2" << " " << "maxu" << " " << "minu" << std::endl;
 
@@ -626,6 +660,10 @@ int main(int argc, char **argv){
     std::ofstream pdfout("pdfu.dat");
     pdfout << "#u" << " " << "count " << "t" << "\n";
 
+    std::ofstream pdfout2("pdfdudx.dat");
+    pdfout2 << "#dudx" << " " << "count " << "t" << "\n";
+
+    
     if(argc!=4){
         std::cout << "Usage: " << argv[0] << " L Nrun seed" << std::endl;
         std::cout << "L: interface length" << std::endl;
@@ -717,6 +755,7 @@ int main(int argc, char **argv){
     	    C.print_roughness(cmlogout,dt*i);
     	    #ifdef NBINS	
     	    C.print_pdf_u(pdfout,dt*i);
+    	    C.print_pdf_dudx(pdfout2,dt*i);
             #endif 
     	    jlogx*=2;
         }
