@@ -695,7 +695,7 @@ int main(int argc, char **argv){
     std::ofstream zerosdudxout("zerosdudx.dat");
     zerosdudxout << "#zeroat" << "\n";
     
-    std::ofstream nzerosdudxout("zerosdudx.dat");
+    std::ofstream nzerosdudxout("nzerosdudx.dat");
     nzerosdudxout << "#t numberOfZeros" << "\n";
 
     if(argc!=4){
