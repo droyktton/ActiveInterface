@@ -1,12 +1,13 @@
-#include<thrust/device_vector.h>
-#include<thrust/host_vector.h>
-#include<thrust/for_each.h>
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include <thrust/for_each.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/tuple.h>
-#include<thrust/reduce.h>
-#include<fstream>
-#include<cstdlib>
+#include <thrust/reduce.h>
+#include <thrust/copy.h>
+#include <fstream>
+#include <cstdlib>
 #include <thrust/transform_reduce.h>
 #include <thrust/transform.h>
 #include <cufft.h>
@@ -445,6 +446,33 @@ class cuerda{
         out << "\n" << std::endl;
     }
 
+    unsigned long print_zeros_of_dudx(std::ofstream &out1, std::ofstream &out2, real t)
+    {
+        real *arr = thrust::raw_pointer_cast(&dudx[0]); 
+        int Ndata = dudx.size();
+        
+        thrust::device_vector<unsigned long> output(Ndata);
+        
+        auto begin = thrust::make_counting_iterator(0);
+        auto end   = thrust::make_counting_iterator(Ndata-1);
+        
+        auto new_end = thrust::copy_if(
+            begin, end,                      // indices
+            output.begin(),                  // destination
+            [=] __host__ __device__ (int i) {
+                return (arr[i] > 0 && arr[i+1] < 0) || (arr[i] < 0 && arr[i+1] > 0);
+            }); 
+        output.resize(new_end - output.begin());  // shrink to fit
+        
+        
+        out1 << t << " " << output.size() << "\n"; 
+        for(int i=0;i<output.size();i++)
+            out2 << output[i] << "\n";
+        out2 << "\n\n" << std::endl;
+        
+        return output.size();
+    }
+
     // Computes the forces and advance one time step using Euler method
     void update(unsigned long n)
     {
@@ -588,6 +616,7 @@ class cuerda{
         }
         out << "\n" << std::endl;
     };
+        
 
     // variables and arrays of the class
     private:
@@ -663,7 +692,12 @@ int main(int argc, char **argv){
     std::ofstream pdfout2("pdfdudx.dat");
     pdfout2 << "#dudx" << " " << "count " << "t" << "\n";
 
+    std::ofstream zerosdudxout("zerosdudx.dat");
+    zerosdudxout << "#zeroat" << "\n";
     
+    std::ofstream nzerosdudxout("zerosdudx.dat");
+    nzerosdudxout << "#t numberOfZeros" << "\n";
+
     if(argc!=4){
         std::cout << "Usage: " << argv[0] << " L Nrun seed" << std::endl;
         std::cout << "L: interface length" << std::endl;
@@ -753,6 +787,7 @@ int main(int argc, char **argv){
         
         if(i%jlogx==0){
     	    C.print_roughness(cmlogout,dt*i);
+    	    C.print_zeros_of_dudx(nzerosdudxout,zerosdudxout,dt*i);
     	    #ifdef NBINS	
     	    C.print_pdf_u(pdfout,dt*i);
     	    C.print_pdf_dudx(pdfout2,dt*i);
