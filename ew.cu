@@ -196,7 +196,7 @@ class cuerda{
         unsigned long seed_ = seed;
         unsigned long L_ = L;
 
-		std::cout << "warming up noise" << std::endl; 
+		std::cout << "starting warming up noise" << std::endl; 
         unsigned long twarm = (unsigned long )(5.*TAU/dt_); // number of warmup steps
         for(unsigned long n=0;n<twarm;n++)
         {
@@ -218,6 +218,7 @@ class cuerda{
                 } 
             );  
         }
+		std::cout << "noise ready" << std::endl; 
     };
 
 
