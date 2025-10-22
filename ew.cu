@@ -195,10 +195,12 @@ class cuerda{
         real dt_ = dt;
         unsigned long seed_ = seed;
         unsigned long L_ = L;
-        
+
+		std::cout << "warming up noise" << std::endl; 
         unsigned long twarm = (unsigned long )(5.*TAU/dt_); // number of warmup steps
         for(unsigned long n=0;n<twarm;n++)
         {
+			
             thrust::for_each(
                 thrust::make_zip_iterator(
                     thrust::make_tuple(noise.begin(),thrust::make_counting_iterator((unsigned long)0))        
