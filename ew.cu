@@ -196,7 +196,7 @@ class cuerda{
         unsigned long seed_ = seed;
         unsigned long L_ = L;
         
-        unsigned long twarm = (unsigned long )(100.*TAU/dt_); // number of warmup steps
+        unsigned long twarm = (unsigned long )(5.*TAU/dt_); // number of warmup steps
         for(unsigned long n=0;n<twarm;n++)
         {
             thrust::for_each(
