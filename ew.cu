@@ -71,7 +71,7 @@
 
 // prints whole configurations every MONITORCONF steps
 #ifndef MONITORCONF
-#define MONITORCONF 100000
+#define MONITORCONF 1000000
 #endif
 
 // define to work in double or simple precision
