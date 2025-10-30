@@ -771,6 +771,8 @@ int main(int argc, char **argv){
     unsigned long jlog=1;
     unsigned long jlogx=1;
 
+    
+
     for(int i=0;i<=Nrun;i++){
         C.update(i);
 
@@ -817,9 +819,10 @@ int main(int argc, char **argv){
        
     logout << "Time taken: " << duration.count() << " seconds\n L=" << L << " Nrun=" << Nrun << std::endl;
     logout << "device= " << deviceProp.name << std::endl;
-
     logout << "Performance[s,L,Nrun]: " << duration.count() << " " << L << " " << Nrun << std::endl;
-
+    
+    std::cout << "Time taken: " << duration.count() << " seconds\n L=" << L << " Nrun=" << Nrun << std::endl;
+    
     return 0;
 }
 
