@@ -760,6 +760,13 @@ int main(int argc, char **argv){
     #ifdef TAUINFINITO
     logout << "TAUINFINITO" << "\n";
     #endif
+    #ifdef NBINS
+    logout << "NBINS= " << NBINS << "\n";
+    #endif
+    #ifdef NOLOGMONITOR
+    logout << "NOLOGMONITOR" << "\n";
+    #endif
+    
     logout 
 	<< "dt= " << dt << "\n"
 	<< "L= " << L << std::endl;
@@ -768,9 +775,10 @@ int main(int argc, char **argv){
     // Start the timer
     auto start = std::chrono::high_resolution_clock::now();
 
+    #ifndef NOLOGMONITOR
     unsigned long jlog=1;
     unsigned long jlogx=1;
-
+    #endif
     
 
     for(int i=0;i<=Nrun;i++){
@@ -782,6 +790,7 @@ int main(int argc, char **argv){
             C.print_inst_sofq(instsofqoutmonitor,dt*i);
         }
                 
+        #ifndef NOLOGMONITOR        
         // print configs and structure factors at 1,10,100,etc...        
         if(i%jlog==0){
             C.print_config(confout);
@@ -799,7 +808,7 @@ int main(int argc, char **argv){
             #endif 
     	    jlogx*=2;
         }
-        
+        #endif
         //if(i%Neq==0) C.reset_acum_Sofq();
                         
         if(i%MONITOR==0){
