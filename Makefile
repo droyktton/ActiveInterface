@@ -11,7 +11,7 @@ TEMP?=0.1
 
 INCLUDES = -I/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2/include 
 FLAGS = --expt-extended-lambda -lcufft -std=c++17 -arch=sm_75 \
--gencode arch=compute_61,code=sm_61 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_75,code=sm_75 -DNOLOGMONITOR
+-gencode arch=compute_61,code=sm_61 -gencode arch=compute_80,code=sm_80 -gencode arch=compute_75,code=sm_75 #-DNOLOGMONITOR
 PARAMSEW = -DC2=$(C2) -DTAU=$(TAU) -DMONITOR=$(MONITOR) -DNBINS=100 -DDt=$(Dt) -DMONITORCONF=$(MONITORCONF) -DTEMP=$(TEMP)#-DDOUBLE  
 PARAMSKPZ = -DC2=$(C2) -DKPZ=1.0 -DTAU=$(TAU) -DMONITOR=$(MONITOR) -DNBINS=100 -DDt=$(Dt) -DMONITORCONF=$(MONITORCONF) -DTEMP=$(TEMP) #-DDOUBLE  
 PARAMSANH = -DC2=$(C2) -DC4=$(C4) -DTAU=$(TAU) -DMONITOR=$(MONITOR) -DNBINS=100 -DDt=$(Dt) -DMONITORCONF=$(MONITORCONF) -DTEMP=$(TEMP) #-DDOUBLE  
