@@ -801,7 +801,7 @@ int main(int argc, char **argv){
     	    C.print_pdf_u(pdfout,dt*i);
     	    C.print_pdf_dudx(pdfout2,dt*i);
             #endif 
-    	    jlogx*=2;
+    	    jlogx*=10;
         }
         #endif
         //if(i%Neq==0) C.reset_acum_Sofq();
