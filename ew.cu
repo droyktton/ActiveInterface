@@ -135,10 +135,12 @@ class cuerda{
 		#endif
 
 	    // height distribution
+    	#ifdef NBINS	
 	    pdf_u.resize(NBINS);
 	    pdf_dudx.resize(NBINS);
 	    thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
 	    thrust::fill(pdf_dudx.begin(),pdf_dudx.end(), 0);
+        #endif
 
         // flat initial condition
         thrust::fill(u.begin(),u.end(),real(0.0));
@@ -395,6 +397,7 @@ class cuerda{
 			<< " " << maxu << " " << minu << std::endl;
     }
 
+    #ifdef NBINS
     void print_pdf_u(std::ofstream &out, real t)
     {
         thrust::fill(pdf_u.begin(),pdf_u.end(), 0);
@@ -427,8 +430,6 @@ class cuerda{
     void print_pdf_dudx(std::ofstream &out, real t)
     {
         thrust::fill(pdf_dudx.begin(),pdf_dudx.end(), 0);
-        
-        
         
         real *raw_dudx = thrust::raw_pointer_cast(&dudx[0]); 
         int *raw_pdf_dudx = thrust::raw_pointer_cast(&pdf_dudx[0]); 
@@ -475,6 +476,7 @@ class cuerda{
         
         return output.size();
     }
+    #endif
 
     // Computes the forces and advance one time step using Euler method
     void update(unsigned long n)
@@ -796,8 +798,8 @@ int main(int argc, char **argv){
         
         if(i%jlogx==0){
     	    C.print_roughness(cmlogout,dt*i);
-    	    C.print_zeros_of_dudx(nzerosdudxout,zerosdudxout,dt*i);
     	    #ifdef NBINS	
+    	    C.print_zeros_of_dudx(nzerosdudxout,zerosdudxout,dt*i);
     	    C.print_pdf_u(pdfout,dt*i);
     	    C.print_pdf_dudx(pdfout2,dt*i);
             #endif 
