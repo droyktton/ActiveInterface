@@ -519,6 +519,7 @@ class cuerda{
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, n, &state);
                 real ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
+                //real ran = 0.0;
                 raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/TAU;
 				#else
                 // correlated noise update 
@@ -784,12 +785,6 @@ int main(int argc, char **argv){
     for(int i=0;i<=Nrun;i++){
         C.update(i);
 
-        if(i%MONITORCONF==0){
-            C.print_config(confout);
-            C.fourier_transform();
-            C.print_inst_sofq(instsofqoutmonitor,dt*i);
-        }
-                
         #ifndef NOLOGMONITOR        
         // print configs and structure factors at 1,10,100,etc...        
         if(i%jlog==0){
@@ -811,9 +806,17 @@ int main(int argc, char **argv){
         #endif
         //if(i%Neq==0) C.reset_acum_Sofq();
                         
+        #ifndef NOMONITOR                    
+        if(i%MONITORCONF==0){
+            C.print_config(confout);
+            C.fourier_transform();
+            C.print_inst_sofq(instsofqoutmonitor,dt*i);
+        }
+                
         if(i%MONITOR==0){
             C.print_roughness(cmout,dt*i);
         }
+        #endif
     }
 
     // Stop the timer
