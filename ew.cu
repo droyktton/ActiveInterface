@@ -527,7 +527,7 @@ class cuerda{
                 // correlated noise update 
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, 1, &state);
-                real ran = curand_normal(&state);
+                real ran = sqrt(2*TEMP)*curand_normal(&state);
                 raw_noise[i] = ran;
 				#endif
 
