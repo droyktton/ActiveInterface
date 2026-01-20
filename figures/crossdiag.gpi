@@ -1,0 +1,35 @@
+#!/usr/bin/gnuplot -c
+NAME = "crossdiag"
+
+set terminal cairolatex size 4,3 pdf font ",11" standalone
+print "# generando tex en ".NAME.".tex"
+set output NAME.".tex"
+
+
+z1 = 2.0
+z2 = 1.5
+f1(x) = (x < 1) ? (x**(1./z1)) : 1.0
+f2(x) = (x > 1) ? (x**(1./z2)) : (1./0)
+g(x) = (x < 1) ? f1(x) : f2(x)
+
+set key left; 
+set xlabel '$\tau/\tau_{\mathrm{anh}}$';  
+set ylabel '$l/l_{\mathrm{anh}}$'; 
+
+set label 1 'EW' at 1,1.5; 
+set label 2 'LM' at 1,0.5; 
+set label 3 'ALM' at 3,1.5; 
+#set label 4 '$l_{anh}=l_0(\tau_{anh}/{\tau}_0)$' at 1.5,2.2; 
+
+z(x)=(x==1)?2.0:(1.5)
+
+set samples 2000
+set style fill transparent solid 0.1 noborder
+
+plot [0:4][:2.5] (x<1)?((x/1.)**(1/z(1.))):(1./0) lw 4 t '$l_0(\tau/\tau_0)^{1/z_\mathrm{LM}}$', \
+(x>1)?((x/1.)**(1/z(2.))):(1./0) lw 4  t '$l_{\mathrm{anh}}(\tau/\tau_{\mathrm{anh}})^{1/z_\mathrm{ALM}}$',\
+(x>1)?(1):(1./0) lw 4 t '$l_{\mathrm{anh}}=l_0(\tau_{\mathrm{anh}}/{\tau}_0)$', \
+(x>=0) ? f1(x) : (1./0) with filledcurves y1=0 lc rgb "#1f77b4" notitle, \
+(x>1) ? f2(x) : (1./0) with filledcurves y1=1 lc rgb "#ff7f0e" notitle \
+    
+
