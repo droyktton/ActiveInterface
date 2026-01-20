@@ -1,0 +1,67 @@
+#!/usr/bin/gnuplot -c
+
+NAME="crossLMtoEW"
+
+set terminal cairolatex size 4,6 pdf font ",12" standalone
+print "3generating ".NAME.".tex"
+set output NAME.".tex"
+
+Vq(t,q,c2,tau,D) = \
+    D/tau * (exp(-c2*q*q*t) - exp(-t/tau))**2 / (1 - c2*q*q*tau)**2 \
+  + 2*D/tau**2 * 1/(1 - c2*q*q*tau)**2 * ( \
+        (1 - exp(-2*c2*q*q*t))/(2*c2*q*q) \
+      + tau*(1 - exp(-2*t/tau))/2 \
+      - 2*(1 - exp(-(c2*q*q + 1/tau)*t))/(c2*q*q + 1/tau) )
+
+
+c2 = 1.0
+tau = 10.0
+D = 1.0
+q  = 2.0
+t = 100
+
+set logs
+
+#list="1 2 4 8 16 32 64 128 256 512 1024 2048 4096 8192 100000000000"
+list="1 4 16 64 256 1024 4096 16384 65536 262144"
+list="1 16 256 4096 65536"
+
+set format x "$10^{%T}$"
+set format y "$10^{%T}$"
+
+set multi lay 2,1
+
+set xlabel "$q$"
+set ylabel "$S(q,t)$"
+
+set key right
+
+plot [0.001:20][:1e6]  for[t in list] Vq(t*0.1,x,c2,tau,D) w l lw 1 t sprintf('$t=%s$',t), \
+Vq(1000000000,x,c2,tau,D) w l lw 3 t '$t=\\\infty$', \
+0.002/x**(1+2*3./2.) lt -1 dt 4 t  'LM', 0.02/x**(1+2*1./2.) lt -1 dt 3 t 'EW'
+
+##############
+
+set key at graph 0.4,1.0
+
+set xlabel "$t$"
+set ylabel "$S(q,t)$"
+
+plot [1e-2:10000000][:50000] \
+Vq(x,0.01,c2,tau,D) t '$q<q*$', \
+Vq(x,0.04,c2,tau,D) t '$q<q*$', \
+Vq(x,1.5,c2,tau,D) t '$q>q*$',\
+Vq(x,0.5,c2,tau,D) t '$q>q*$',\
+0.003*x**((1+2*3./2)/2) lt -1 dt 4 t 'LM', \
+0.05*x**((1+2*1./2)/2) lt -1 dt 3 t 'EW'
+ 
+
+
+##############
+#Nmax=1000
+#L=100.0
+#C_of_t(t) = 2.0/L * ( sum [n=1:Nmax] Vq(t,2*pi/L,c2,tau,D) )
+
+#plot C_of_t(t) 
+
+unset multi 
