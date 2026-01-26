@@ -1,3 +1,11 @@
+#ifdef RANDOM123
+  #define R123_USE_CUDA
+  #define R123_NO_SSE
+  #include <Random123/philox.h>
+#else
+  #include <curand_kernel.h>
+#endif
+
 #include <thrust/device_vector.h>
 #include <thrust/host_vector.h>
 #include <thrust/for_each.h>
@@ -14,8 +22,30 @@
 #include "cutil.h"
 #include <chrono>
 #include <iomanip>
-#include <curand_kernel.h>
 #include <thrust/complex.h>
+
+
+#ifdef RANDOM123
+using philox_t = r123::Philox4x32;
+__device__ inline float rng_normal(uint32_t i, uint32_t n, uint32_t seed)
+{
+    philox_t::key_type key = {{seed, 0}};
+    philox_t::ctr_type ctr = {{i, n, 0, 0}};
+    philox_t::ctr_type out = philox_t()(ctr, key);
+
+    // Box–Muller using two 32-bit outputs
+    float u1 = (out[0] + 1.0f) * 2.3283064e-10f;
+    float u2 = (out[1] + 1.0f) * 2.3283064e-10f;
+
+    return sqrtf(-2.0f * logf(u1)) * cosf(2.0f * M_PI * u2);
+}
+#else
+__device__ inline float rng_normal(curandStatePhilox4_32_10_t &state)
+{
+    return curand_normal(&state);
+}
+#endif
+
 
 
 // harmonic elasticity constant
@@ -213,9 +243,15 @@ class cuerda{
                 [=] __device__ (thrust::tuple<real &,unsigned long> t)
                 {
                     unsigned long i=thrust::get<1>(t);
+
+                    #ifdef RANDOM123
+                    real ran = sqrtf(2*TEMP*dt_)*rng_normal(i,n,seed_);
+                    #else
                     curandStatePhilox4_32_10_t state;
                     curand_init(seed_, i, n, &state);
-                    real ran = sqrtf(2*TEMP*dt_)*curand_normal(&state);
+                    //real ran = sqrtf(2*TEMP*dt_)*curand_normal(&state);
+                    real ran = sqrtf(2*TEMP*dt_)*rng_normal(state);
+                    #endif
                     thrust::get<0>(t) += -thrust::get<0>(t)*dt_/TAU + ran/TAU;
                 } 
             );  
@@ -517,18 +553,30 @@ class cuerda{
                 #endif
 
 				#ifndef TAUINFINITO
+
                 // correlated noise update 
+                #ifdef RANDOM123
+                real ran = sqrt(2*TEMP*dt_)*rng_normal(i, n, seed_);
+                #else
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, n, &state);
                 real ran = sqrt(2*TEMP*dt_)*curand_normal(&state);
+                #endif
                 //real ran = 0.0;
                 raw_noise[i] += -raw_noise[i]*dt_/TAU + ran/TAU;
+
 				#else
+
                 // correlated noise update 
+                #ifdef RANDOM123
+                real ran = sqrt(2*TEMP*dt_)*rng_normal(i, n, seed_);
+                #else
                 curandStatePhilox4_32_10_t state;
                 curand_init(seed_, i, 1, &state);
-                real ran = sqrt(2*TEMP)*curand_normal(&state);
+                real ran = sqrt(2*TEMP)*rng_normal(state);
+                #endif
                 raw_noise[i] = ran;
+
 				#endif
 
                 //real lap_u = (uright + uleft - 2.0*raw_u[i]);
@@ -768,6 +816,11 @@ int main(int argc, char **argv){
     #endif
     #ifdef NOLOGMONITOR
     logout << "NOLOGMONITOR" << "\n";
+    #endif
+    #ifdef RANDOM123
+    logout << "USING RANDOM123" << "\n";
+    #else 
+    logout << "USING CURAND" << "\n";
     #endif
     
     logout 
