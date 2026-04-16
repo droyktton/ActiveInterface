@@ -657,7 +657,7 @@ class cuerda{
 
     // prints the whole averaged structure factor to a file
     void print_sofq(std::ofstream &out){
-        for(int i=0;i<L;i++){
+        for(int i=0;i<L/2.0;i++){
             out << acum_Sofq_u[i]/fourierCount << "\n";
         }
         out << "\n" << std::endl;
@@ -665,7 +665,7 @@ class cuerda{
 
     // prints the instantaneous structure factor to a file
     void print_inst_sofq(std::ofstream &out, real t){
-        for(int i=0;i<L;i++){
+        for(int i=0;i<L/2.0;i++){
             out << inst_Sofq_u[i] << " " << t << "\n";
         }
         out << "\n" << std::endl;
