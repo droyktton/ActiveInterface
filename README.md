@@ -1,5 +1,3 @@
-Here is a clean, comprehensive, and professional **README.md** tailored for your GitHub repository. It bridges the gap between your high-performance CUDA/Thrust implementation and the theoretical physics framework targeting Physical Review journals, making it easy for other researchers to clone, run, and cite your work.
-
 ---
 
 # Active-Nonlinear-Interfaces: High-Order Interface Growth & Active Noise Solver
