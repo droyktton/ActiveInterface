@@ -20,7 +20,7 @@ Where:
 * **$c_{2n} > 0$**: The anharmonic elasticity coefficient governing high-order gradient penalties ($n > 1$), which explicitly **breaks Statistical Tilt Symmetry (STS)**.
 * **$\eta(x,t)$**: Active colored noise satisfying $\langle \eta(x,t) \rangle = 0$ with an exponential temporal correlation:
 
-$$\langle \eta(x,t)\eta(x',t') \rangle = \frac{2T}{\tau} \delta(x-x') e^{-\frac{|t-t'|}{\tau}}$$
+$$\langle \eta(x,t)\eta(x',t') \rangle = \frac{T}{\tau} \delta(x-x') e^{-\frac{|t-t'|}{\tau}}$$
 
 where $\tau$ represents the active persistence timescale and $T$ is the noise temperature.
 
@@ -106,9 +106,9 @@ The program outputs standard real-space and spectral files for downstream post-p
 
 This software is calibrated to capture three distinct self-affine regimes across spatial scales ($l$):
 
-1. **Larkin / Mueller Regimes ($l < l_1$)**: Dominated by active memory structures where $S(q) \sim q^{-4}$.
-2. **Edwards-Wilkinson Baseline ($l_1 < l < l_{\text{anh}}$)**: Intermediate structural relaxation where $S(q) \sim q^{-2}$.
-3. **Anharmonic Nonlinear Clamping ($l > l_{\text{anh}}$)**: Asymptotic regime governed by $c_{2n}$ which tames unphysical rough instabilities, inducing a sub-affine roughness exponent $\zeta = \frac{1}{2n-1}$.
+1. **Larkin Regimes ($l < l_1$)**.
+2. **Anharmonic Larkin Regime**.
+3. **Edwards-Wilkinson**.
 
 ---
 
