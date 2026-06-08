@@ -125,8 +125,7 @@ If this codebase assists your research or analytical data processing, please cit
 
 ```bibtex
 @article{Camara2026Roughening,
-  title={Roughening of active nonlinear interfaces with broken 
-tilt symmetry},
+  title={Roughening of active nonlinear interfaces with broken tilt symmetry},
   author={C{\'a}mara, A. M. and Kolton, A. B. and Igua{\'\i}n, J. L.},
   journal={Physical Review B / E},
   year={2026},
