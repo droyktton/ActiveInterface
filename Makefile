@@ -38,7 +38,7 @@ ALM:
 STRONGANH: 
 	$(CXX) $(FLAGS) $(PARAMSPUREANH) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
 
-activeinterface: ew.cu Makefile
+activeinterface: main.cu Makefile
 	$(CXX) $(FLAGS) $(PARAMSEW) ew.cu -o activeinterface $(LDFLAGS) $(INCLUDES) 
 
 update_git:
