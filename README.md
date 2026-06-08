@@ -104,9 +104,10 @@ The program outputs standard real-space and spectral files for downstream post-p
 
 ## 📊 Expected Scaling Regimes
 
-This software is calibrated to capture three distinct self-affine regimes across spatial scales ($l$):
+This software is calibrated to capture three distinct self-affine regimes across spatial scales, depending on the coupling parameter 
+$\Gamma_{2n} = \frac{c_{2n} T}{c_2^{(3n-1)/2} \sqrt{\tau}}$:
 
-1. **Larkin Regimes ($l < l_1$)**.
+1. **Larkin Regimes**.
 2. **Anharmonic Larkin Regime**.
 3. **Edwards-Wilkinson**.
 
